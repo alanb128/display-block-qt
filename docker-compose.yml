@@ -1,0 +1,28 @@
+version: '2.1'
+
+services:
+  display:
+    image: bh.cr/balena_solutions/display-aarch64
+    privileged: true
+    restart: always
+    network_mode: host
+    volumes:
+      - display-socket:/run
+    labels:
+      io.balena.features.dbus: '1'
+
+  your-app:
+    build: ./qt
+    restart: always
+    depends_on:
+      - display
+    volumes:
+      - display-socket:/run
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      - WAYLAND_DISPLAY=wayland-0
+      - XDG_RUNTIME_DIR=/run/user/0
+
+volumes:
+  display-socket:
